@@ -26,7 +26,7 @@ A FastAPI-based REST API for searching and filtering employee records with role-
 ## Project Structure
 
 ```
-hr_test_assignment/
+demo_employee_search/
 ├── src/
 │   ├── main.py                 # FastAPI app entry point
 │   ├── conftest.py             # pytest configuration
@@ -57,8 +57,8 @@ The python version for this project is 3.10.
 
 1. **Clone the repository**:
    ```bash
-   git clone <repo-url>
-   cd hr_test_assignment
+   git clone git@github.com:solus161/demo_employee_search.git
+   cd demo_employee_search
    ```
 
 2. **Create a virtual environment**:
