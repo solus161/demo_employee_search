@@ -2,3 +2,4 @@ __pycache__
 .pytest_cache
 docs
 docs/*
+backend/database.db

@@ -1,0 +1,26 @@
+[pytest]
+# Pytest configuration
+minversion = "9.0"
+testpaths = ["tests"]
+pythonpath = ["."]  # Add current directory (backend) to Python path
+asyncio_mode = "auto"
+
+# Output options
+addopts = [
+    "-v",           # Verbose
+    "-ra",          # Show summary of all test outcomes
+    "--strict-markers",  # Enforce marker registration
+]
+
+# Test discovery patterns
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*", "*Tests"]
+python_functions = ["test_*"]
+
+# Markers
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (database required)",
+    "auth: Authentication related tests",
+    "slow: Slow running tests",
+]

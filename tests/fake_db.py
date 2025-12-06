@@ -1,47 +1,77 @@
-import psycopg
+import sqlite3
 import pandas as pd
-from tqdm import tqdm
+
+from backend.auth.models import User, Department
 
 if __name__ == "__main__":
-    # Connect to your postgres DB
-    connect_params = {
-        'host': 'localhost',
-        'port': 5432,
-        'database': 'learning',
-        'user': 'postgres',
-        'password': '1'
-    }
-    conn = psycopg.connect("""
-        host={host} port={port} dbname={database} user={user} password={password}
-    """.format(**connect_params))
+    # Create a fake db in sqlite
+    conn = sqlite3.connect('../backend/database.db')
     cursor = conn.cursor()
+
+    # Create table
+    cursor.execute(
+        """
+        create table if not exists tbl_user (
+            id integer primary key,
+            username text unique not null,
+            email text unique not null,
+            department text,
+            password not null
+        )
+        """
+    )
+
+    conn.commit()
+    
+    cursor.execute(
+        """
+        create table if not exists tbl_employee (
+            id text primary key,
+            first_name text not null,
+            last_name text not null,
+            birthdate text,
+            gender text,
+            race text,
+            department text,
+            jobtitle text,
+            location text,
+            hire_date text,
+            termdate text,
+            location_city text,
+            location_state text
+        );
+        """)
+    conn.commit()
+
+    cursor.execute(
+        """
+        create table if not exists tbl_department (
+            id integer primary key,
+            name text unique not null,
+            authorized_columns text
+        )
+        """
+    )
+    conn.commit()
 
     # Load sample data
     df = pd.read_csv('data/hr.csv')
-    df = df.iloc[:20000,:]
-    df = df[['first_name', 'last_name', 'location_city', 'location_state', 'department', 'jobtitle']].copy()
-    df.rename(columns={
-        'location_state': 'location',
-        'location_city': 'company',
-        'jobtitle': 'position'}, inplace=True)
+    df.to_sql('tbl_employees', conn, if_exists = 'append', index = False)
 
-    data = []
-    for i, row in df.iterrows():
-        data.append((
-            row['first_name'],
-            row['last_name'],
-            None,
-            row['location'],
-            row['company'],
-            row['department'],
-            row['position']
-        ))
-    
-    # Fake a 20m records by inserting the same 20k records 1000 times
-    for i in tqdm(range(1000)):
-        cursor.executemany("""
-            insert into tbl_employees (
-                first_name, last_name, contact_info, location, company, department, position)
-            values (%s, %s, %s, %s, %s, %s, %s)""", data)
-        conn.commit()
+    # Fake authorized data
+    departments = [
+        ('Headquarters', 'id,first_name,last_name,birthdate,gender,race,department,jobtitle,location,hire_date,termdate,location_city,location_state'),
+        ('Business Development', 'id,first_name,last_name,birthdate,gender,race,department,jobtitle')
+    ]
+
+    cursor.executemany(
+        """
+        insert into tbl_department (name, authorized_columns)
+        values (?, ?)
+        """, 
+        departments
+    )
+    conn.commit()
+
+    print('Fake db create at backend/database.db')
     conn.close()
