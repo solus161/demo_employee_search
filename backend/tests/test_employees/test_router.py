@@ -1,18 +1,12 @@
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.testclient import TestClient
 from httpx import AsyncClient, ASGITransport
 import pytest
 import pytest_asyncio
-import asyncio
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-from unittest.mock import MagicMock
 from logging import getLogger
 
 # from auth.models import User, Department
 from main import app
 from employees.router import ROUTER_PREFIX, auth_process
 from exceptions.users import *
-from middleware.rate_limiter import RateLimiter
 from database import get_db_session
 
 logger = getLogger(__name__)
@@ -59,6 +53,7 @@ async def test_search_employee(
         'page': 1
     }
     response = await async_test_client.get(
-        ROUTER_PREFIX + '/employees', 
+        ROUTER_PREFIX + '/search', 
         params = search_params)
     assert response.status_code == 200
+    assert 'Kimmy' in response.json()['dataEmployee'][0]['first_name']

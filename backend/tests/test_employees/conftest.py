@@ -87,4 +87,3 @@ async def mock_db_employees(async_session):
     query = select(EmployeeModel).where(EmployeeModel.first_name == 'Kimmy')
     e = await async_session.execute(query)
     e = e.scalars().first()
-    print(e)

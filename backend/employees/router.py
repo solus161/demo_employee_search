@@ -7,30 +7,30 @@ from typing import Annotated
 import traceback
 
 from auth.services import get_current_user, get_authorized_columns
+from auth.router import ROUTER_PREFIX as ROUTER_AUTH
 from employees.models import Employee as EmployeeModel, build_query
 from employees.schemas import PaginatedEmployeeResponse
 from employees.services import get_employees
 from database import get_db_session
 
 
-
-ROUTER_PREFIX = '/api/v1'
+ROUTER_PREFIX = '/api/v1/employee'
 router = APIRouter(prefix = ROUTER_PREFIX, tags = ['Employees'])
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl = ROUTER_PREFIX + '/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl = ROUTER_AUTH + '/token')
 PAGINATION_LIMIT = 50
 
 async def auth_process(
     db_session: AsyncSession = Depends(get_db_session),
-    token = Annotated[str, Depends(oauth2_scheme)]):
+    token = Depends(oauth2_scheme)):
     user = await get_current_user(db_session, token)
     authorized_columns = await get_authorized_columns(db_session, user)
     return authorized_columns
 
 @router.get(
-    '/employees', response_model = PaginatedEmployeeResponse,
+    '/search', response_model = PaginatedEmployeeResponse,
     response_model_exclude_unset = True,
-    status_code=status.HTTP_200_OK,
-    description="Search and filter employees with pagination")
+    status_code = status.HTTP_200_OK,
+    description = "Search and filter employees with pagination")
 async def search_employees(
     search_str: str,
     department: Optional[str] = Query(None),

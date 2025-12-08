@@ -1,16 +1,30 @@
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.testclient import TestClient
+from httpx import AsyncClient, ASGITransport
 import pytest
 import pytest_asyncio
+import asyncio
 from sqlalchemy import StaticPool, select
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
+from unittest.mock import MagicMock
+from logging import getLogger
 
-from auth.models import Base, User, Department
+# from auth.models import User, Department
+from main import app
+from auth.models import Base as AuthBase, User, Department
 from auth.services import create_hashed_password
-from employees.models import Employee as EmployeeModel
+from employees.models import Base as EmployeeBase, Employee
+from employees.router import ROUTER_PREFIX, auth_process
+from exceptions.users import *
+from middleware.rate_limiter import RateLimiter
+from database import get_db_session
+
+logger = getLogger(__name__)
 
 # Test database URL (in-memory SQLite for fast tests)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
-@pytest_asyncio.fixture(scope = 'session')
+@pytest_asyncio.fixture(scope = 'module')
 async def async_engine():
     """
     Create an async engine for in-memory sqlite db.
@@ -28,18 +42,20 @@ async def async_engine():
 
     # Setup tables
     async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(AuthBase.metadata.create_all)
+        await conn.run_sync(EmployeeBase.metadata.create_all)
     print('Tables setup done')
 
     yield async_engine
 
     # Clean up
     async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(AuthBase.metadata.drop_all)
+        await conn.run_sync(EmployeeBase.metadata.drop_all)
     
     await async_engine.dispose()
 
-@pytest_asyncio.fixture(scope = 'session')
+@pytest_asyncio.fixture(scope = 'module')
 async def async_session(async_engine):
     """
     Create an sqlaslchemy async session maker
@@ -54,8 +70,25 @@ async def async_session(async_engine):
         yield async_session
         await async_session.rollback()
 
+
+@pytest_asyncio.fixture(scope = 'module')
+async def setup_override_db(async_session):
+    async def override_get_db_session():
+        yield async_session
+    app.dependency_overrides[get_db_session] = override_get_db_session
+    yield
+    print('Override cleared')
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope = 'module')
+async def async_test_client():
+    async with AsyncClient(
+        transport = ASGITransport(app = app), base_url = 'http://test') as test_client:
+        yield test_client
+
 # Prepare some data to test
-@pytest_asyncio.fixture(scope = 'function')
+@pytest_asyncio.fixture(scope = 'module')
 async def mock_db_users(async_session):
     """
     Add some mock db user for testing
@@ -104,7 +137,7 @@ async def mock_db_users(async_session):
 
     # No cleanup needed - parent async_session fixture handles rollback
 
-@pytest_asyncio.fixture(scope = 'function')
+@pytest_asyncio.fixture(scope = 'module')
 async def mock_db_departments(async_session):
     """
     Add some mock departments
@@ -131,7 +164,7 @@ async def mock_db_departments(async_session):
     for department in departments:
         await async_session.refresh(department)  # refresh() IS async - need await!
 
-@pytest_asyncio.fixture(scope = 'package')
+@pytest_asyncio.fixture(scope = 'module')
 async def mock_db_employees(async_session):
     """
     Add some mock db employee for testing
@@ -152,9 +185,9 @@ async def mock_db_employees(async_session):
         employee_dict = {}
         for j in data:
             employee_dict[j[0]] = j[1]
-        async_session.add(EmployeeModel(**employee_dict))
+        async_session.add(Employee(**employee_dict))
     await async_session.commit()
 
-    query = select(EmployeeModel).where(EmployeeModel.first_name == 'Kimmy')
+    query = select(Employee).where(Employee.first_name == 'Kimmy')
     e = await async_session.execute(query)
     e = e.scalars().first()
