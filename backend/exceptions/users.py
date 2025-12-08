@@ -1,44 +1,58 @@
 from . import CustomException
+from middleware.messages import get_message, MessageCode
 
 class UsernameExistsError(CustomException):
     """
     Raised when an username already exists in the db.
     """
     def __init__(self, username: str):
-        super().__init__(f'Username {username} already exists', 500)
+        super().__init__(
+            get_message(MessageCode.USER_USERNAME_EXISTS, username = username),
+            500)
 
 class EmailExistsError(CustomException):
     def __init__(self, email: str):
-        super().__init__(f'Email {{email}} already exists', 500)
+        super().__init__(
+            get_message(MessageCode.USER_EMAIL_EXISTS, email = email),
+            500)
 
 class CreateUserError(CustomException):
-    def __init__(self, username: str, details: str):
-        super().__init__(f'Error while creating user {username}: {details}', 500)
+    def __init__(self, username: str, detail: str):
+        super().__init__(
+            get_message(MessageCode.USER_CREATION_FAILED, username = username, detail = detail),
+            500)
 
 class InvalidTokenError(CustomException):
     def __init__(self):
-        super().__init__(f'Invalid access token', 401)
+        super().__init__(
+            get_message(MessageCode.AUTH_TOKEN_INVALID), 401)
 
 class ExpiredTokenError(CustomException):
-    def __init__(self, username: str):
-        super().__init__(f'Access token for user {username} has been expired', 401)
+    def __init__(self):
+        super().__init__(
+            get_message(MessageCode.AUTH_TOKEN_EXPIRED), 401)
 
 class UserNotFoundError(CustomException):
-    def __init__(self, username: str):
-        super().__init__(f'User named {username} does not exist', 404)
+    def __init__(self):
+        super().__init__(
+            get_message(MessageCode.AUTH_INVALID_CREDENTIALS), 404)
 
 class WrongPasswordError(CustomException):
     def __init__(self):
-        super().__init__('Wrong password', 401)
+        super().__init__(
+            get_message(MessageCode.AUTH_INVALID_CREDENTIALS), 401)
 
 class RequestLimitError(CustomException):
-    def __init__(self, username: str, try_again: int):
-        super().__init__(f'User {username} reached request limit. Please try again in {try_again} secs', 429)
+    def __init__(self, retry_after: int):
+        super().__init__(
+            get_message(MessageCode.RATE_LIMIT_EXCEEDED, retry_after = retry_after), 429)
 
 class NoDepartmentError(CustomException):
-    def __init__(self, username: str):
-        super().__init__(f'User {username} is assigned to no deparment', 401)
+    def __init__(self):
+        super().__init__(
+            get_message(MessageCode.AUTHZ_NO_DEPARTMENT), 401)
 
 class NoAccessError(CustomException):
-    def __init__(self, deparment):
-        super().__init__(f'Deparment {deparment} has no access right', 403)
+    def __init__(self):
+        super().__init__(
+            get_message(MessageCode.AUTHZ_NO_ACCESS), 403)

@@ -10,18 +10,9 @@ from auth.router import router as auth_router
 from middleware.rate_limiter import RateLimiter
 from exceptions import CustomException
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    logging.info("Starting up the application...")
-    logging.info("Rate limiter deployed")
-    task = asyncio.create_task(RateLimiter.sleep())
-    yield
-    task.cancel()
-
 logger = logging.getLogger(__name__)
 
-
-app = FastAPI(lifespan = lifespan)
+app = FastAPI()
 
 @app.exception_handler(CustomException)
 async def business_exception_handler(request: Request, exc: CustomException):

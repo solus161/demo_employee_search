@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import re
 
 class Token(BaseModel):
     access_token: str
@@ -9,3 +10,9 @@ class User(BaseModel):
     email: str
     password: str
     department: str
+
+class CreateUserForm(BaseModel):
+    username: str
+    email: str
+    password: str
+    department: str | None

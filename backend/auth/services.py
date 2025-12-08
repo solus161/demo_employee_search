@@ -52,6 +52,11 @@ async def create_user(
             department = department,
             password = password
         )
+
+        # First round of integrity check
+        await is_valid_username(db_session, username)
+        await is_valid_email(db_session, email)
+
         db_session.add(user)
         await db_session.commit()
         await db_session.refresh(user)
@@ -92,6 +97,7 @@ def decode_access_token(
     - `username` value of `sub` key
 
     Raises:
+    - `ExpireTokenError`
     - `InvalidTokenError`
     """
     try:
@@ -104,7 +110,7 @@ def decode_access_token(
             datetime_now = datetime.now(timezone.utc)
 
             if datetime_now > expire_datetime:
-                raise ExpiredTokenError(username)
+                raise ExpiredTokenError
             
             return username
         raise InvalidTokenError
@@ -128,7 +134,7 @@ async def get_user(db_session, username: str) -> User:
         - `db_session`: a session managed by an db service
     
     Returns:
-        - `user` object
+        - `User` object
     
     Raises:
         - Raise UserNotFoundError if user does not exists
@@ -138,7 +144,7 @@ async def get_user(db_session, username: str) -> User:
     user = user.scalars().first()
     if user is not None:
         return user
-    raise UserNotFoundError(username)
+    raise UserNotFoundError
 
 async def is_valid_username(db_session, username: str) -> bool:
     """
@@ -168,6 +174,17 @@ async def is_valid_email(db_session, email: str) -> bool:
 async def authenticate(db_session, username: str, password: str) -> User:
     """
     To check whether the user is in db and the password is right
+
+    Args:
+    - `db_session`: database session object, must be async
+    - `username`:
+    - `password`
+
+    Returns:
+    - `User` object
+
+    Raises:
+    - Handled by services functions
     """
     
     user: User = await get_user(db_session, username)
@@ -199,9 +216,7 @@ async def is_within_rate_limit(rate_limiter: RateLimiter, username: str):
     Raises:
         HTTPException: 429 if rate limit exceeded
     """
-    if not rate_limiter.is_within_limit(username):
-        raise RequestLimitError(username, rate_limiter.period)
-    return True
+    return rate_limiter.is_within_limit(username)
 
 async def get_department(db_session, user: User) -> Department:
     """
@@ -214,13 +229,13 @@ async def get_department(db_session, user: User) -> Department:
         User's department string
     """
     if user.department is None or user.department == '':
-        raise NoDepartmentError(user.username)
+        raise NoDepartmentError
     
     query = select(Department).where(Department.name == user.department)
     department = await db_session.execute(query)
     department = department.scalars().first()
     if department is None:
-        raise NoDepartmentError(user.username)
+        raise NoDepartmentError
 
     return department
 
@@ -244,6 +259,6 @@ async def get_authorized_columns(db_session, user: User) -> List[str]:
     department = await get_department(db_session, user)
 
     if department.authorized_columns is None or department.authorized_columns == '':
-        raise NoAccessError(department.name)
+        raise NoAccessError
     
     return department.authorized_columns.split(',')

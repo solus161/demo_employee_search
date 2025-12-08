@@ -1,29 +1,14 @@
 import pytest
 import pytest_asyncio
 import asyncio
-from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from auth.models import User, Department
+# from auth.models import User, Department
 from auth.services import *
 from exceptions.users import *
 from middleware.rate_limiter import RateLimiter
 
-@pytest_asyncio.fixture(scope = 'function')
-async def isolated_async_session(async_engine):
-    """
-    An isolated, test-scope session so tests do not tamper
-    with db setting up by parent fixture
-    """
-    async_session_maker = async_sessionmaker(
-        bind = async_engine,
-        class_ = AsyncSession,
-        expire_on_commit = False)
-    
-    async with async_session_maker() as async_session:
-        yield async_session
-
-# @pytest.mark.asyncio
+@pytest.mark.asyncio
 async def test_create_user(async_session):
     """
     To test `auth.service.create_user`

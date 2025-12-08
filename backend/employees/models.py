@@ -33,13 +33,19 @@ class Employee(Base):
     def __repr__(self):
         return f"<Employee(id={self.id}, name={self.first_name} {self.last_name}>"
 
-def build_query(employee: Employee, columns: list, search_params: dict):
-    query = select(*[getattr(employee, col) for col in columns]).select_from(employee)
+def build_query(authorized_columns: list, search_params: dict):
+    """
+    Build query that return `Employee` based on search params
 
-    # full_name is always required
-    query = query.where(Employee.full_name.ilike(f"%{search_params.get('search_str').lower()}%"))
+    Args:
+    - `authorized_columns`: list of columns that the user could access
+    - `search_params`:  dict of query params, must include a `search_str` for fullname search
+    """
+    # query = select(*[getattr(employee, col) for col in columns]).select_from(employee)
+    query = select(Employee).where(Employee.full_name.ilike(f"%{search_params.get('search_str')}%"))
 
+    # Other params
     for k, v in search_params.items():
-        if k in columns and v is not None:
-            query = query.where(getattr(employee, k) == v)
+        if k in authorized_columns and v is not None:
+            query = query.where(getattr(Employee, k) == v)
     return query

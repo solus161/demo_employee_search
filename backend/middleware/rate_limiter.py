@@ -32,4 +32,6 @@ class RateLimiter:
             self.users[username].append(current_timestamp)
             return True
         else:
-            raise RequestLimitError(username, self.period)
+            raise RequestLimitError(self.period)
+
+global_rate_limiter = RateLimiter(60, 100)

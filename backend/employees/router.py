@@ -1,86 +1,61 @@
 from fastapi import APIRouter, Query, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from typing import List, Optional
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-import time
+from typing import Annotated
 import traceback
 
+from auth.services import get_current_user, get_authorized_columns
 from employees.models import Employee as EmployeeModel, build_query
 from employees.schemas import PaginatedEmployeeResponse
-from database.database import get_db_session
-from backend.auth.services import get_authorized_schema
+from employees.services import get_employees
+from database import get_db_session
 
-router = APIRouter(prefix = '/api/v1', tags = ['Employees'])
+
+
+ROUTER_PREFIX = '/api/v1'
+router = APIRouter(prefix = ROUTER_PREFIX, tags = ['Employees'])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl = ROUTER_PREFIX + '/token')
 PAGINATION_LIMIT = 50
+
+async def auth_process(
+    db_session: AsyncSession = Depends(get_db_session),
+    token = Annotated[str, Depends(oauth2_scheme)]):
+    user = await get_current_user(db_session, token)
+    authorized_columns = await get_authorized_columns(db_session, user)
+    return authorized_columns
 
 @router.get(
     '/employees', response_model = PaginatedEmployeeResponse,
     response_model_exclude_unset = True,
     status_code=status.HTTP_200_OK,
     description="Search and filter employees with pagination")
-async def get_employees(
+async def search_employees(
     search_str: str,
-    location: Optional[str] = Query(None),
-    company: Optional[str] = Query(None),
     department: Optional[str] = Query(None),
-    position: Optional[str] = Query(None),
-    status_active: Optional[bool] = Query(None),
-    status_not_started: Optional[bool] = Query(None),
-    status_terminated: Optional[bool] = Query(None),
+    location_city: Optional[str] = Query(None),
+    location_state: Optional[str] = Query(None),
+    page_size: int = Query(),
     page: int = Query(1, ge = 1),
     db_session: AsyncSession = Depends(get_db_session),     # Replace your own DB session here
-    authorized_columns = Depends(get_authorized_schema)     # Done after authentication
-    # return_schema = Depends(get_authorized_schema)
+    authorized_columns: List = Depends(auth_process)
 ):
-    """
-    Search employees with optional filters.
     
-    - **search_str**: Required name search (1-100 chars)
-    - **location**: Optional location filter
-    - **company**: Optional company filter
-    - **department**: Optional department filter
-    - **position**: Optional position filter
-    - **page**: Page number (default 1)
-    - **page_size**: Items per page (1-100, default 50)
-    
-    Returns paginated employee list with total count.
-    """
-    try:    
-        search_params = {
-            'search_str': search_str,
-            'location': location,
-            'company': company,
-            'department': department,
-            'position': position,
-            'status_active': status_active,
-            'status_not_started': status_not_started,
-            'status_terminated': status_terminated}
+    search_params = {
+        'search_str': search_str,
+        'department': department,
+        'location_city': location_city,
+        'location_state': location_state}
 
-        # Build and count query
-        query = build_query(EmployeeModel, authorized_columns, search_params)
-        query_count = select(func.count()).select_from(query.subquery())
+    employees, total_count, total_page = await get_employees(
+        db_session, authorized_columns, search_params, page, page_size)
 
-        # Get total count for pagination
-        total_count = await db_session.execute(query_count)
-        total_count = total_count.scalar()
-        
-        # Apply pagination
-        offset = (page - 1) * PAGINATION_LIMIT
-        query = query.offset(offset).limit(PAGINATION_LIMIT)
-        
-        # Execute and extract ORM objects
-        employees = await db_session.execute(query)
-        employees = employees.all()
-
-        return PaginatedEmployeeResponse(
-            total = total_count,
-            page = page,
-            page_size = PAGINATION_LIMIT,
-            data = employees
-        )
-    except Exception as e:
-        print(traceback.print_exc())
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal error'
-        )
+    return PaginatedEmployeeResponse(
+        totalCount = total_count,
+        totalPage = total_page,
+        page = page,
+        pageSize = page_size,
+        columns = authorized_columns,
+        dataEmployee = employees
+    )

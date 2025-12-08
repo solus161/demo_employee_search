@@ -4,21 +4,36 @@ from typing import Optional, List
 class Employee(BaseModel):
     # Field set to optional could be ommited
     # by using response_model_exclude_unset = True in route decorator
-    id: int
+    id: str
     first_name: str
     last_name: str
-    location: Optional[str] = None
-    company: Optional[str] = None
+    birthdate: Optional[str] = None
+    gender: Optional[str] = None
+    race: Optional[str] = None
     department: Optional[str] = None
-    position: Optional[str] = None
-    status_active: Optional[bool] = None
-    status_not_started: Optional[bool] = None
-    status_terminated: Optional[bool] = None
+    jobtitle: Optional[str] = None
+    location: Optional[str] = None
+    hire_date: Optional[str] = None
+    termdate: Optional[str] = None
+    location_city: Optional[str] = None
+    location_state: Optional[str] = None
 
     model_config = ConfigDict(from_attributes = True)
 
 class PaginatedEmployeeResponse(BaseModel):
-    total: int
+    totalCount: int
+    totalPage: int
     page: int
-    page_size: int
-    data: List[Employee]
+    pageSize: int
+    columns: List[str]
+    dataEmployee: List[Employee]
+
+    """
+    totalPage: 4,
+    totalCount: 150,
+    currentPage: 3,
+    pageSize: 50,
+    columns: ['id', 'a', 'b'],
+    pageSizeList: [10, 25, 50, 100],
+    dataEmployee
+    """
