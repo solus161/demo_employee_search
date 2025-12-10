@@ -4,7 +4,7 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.schemas import Token, User, CreateUserForm
-from backend.auth.services import authenticate, create_access_token, create_user
+from auth.services import authenticate, create_access_token, create_user
 from database.database import get_db_session
 # from middleware import global_rate_limiter
 

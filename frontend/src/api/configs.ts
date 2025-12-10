@@ -1,9 +1,10 @@
 export const API_CONFIG = {
-    BASE_URL: import.meta.env.VITE_API_BASE_URL,
-    TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT)
+    BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+    TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT) || 30000
 }
 
 export const API_ENDPOINTS = {
-    EMPLOYEES: 'api/v1/employees',
-    LOGIN: 'api/v1/login',
+    SIGNUP: 'api/v1/user/create',
+    LOGIN: 'api/v1/user/token',
+    EMPLOYEES: 'api/v1/employee/search',
 }

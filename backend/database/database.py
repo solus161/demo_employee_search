@@ -12,11 +12,11 @@ from sqlalchemy.orm import sessionmaker
 #     'database': 'learning'
 # }
 
-# db_url = 'postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}'.format(**configs)
 # db_url = 'postgresql+psycopg://{user}:{password}@{host}:{port}/{database}'.format(**configs)
 # engine = create_async_engine(db_url, pool_size = 10, max_overflow = 20)
 # AsyncSession = async_sessionmaker(autocommit = False, autoflush = False, bind = engine)
 
+# For ease of use, use a simple sqlite
 engine = create_engine('sqlite+aiosqlite:///database.db')
 AsyncSession = async_sessionmaker(bind = engine)
 

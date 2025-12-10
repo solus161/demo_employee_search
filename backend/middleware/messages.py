@@ -53,4 +53,4 @@ ERROR_MESSAGES = {
 def get_message(code: MessageCode, **kwargs) -> str:
     """Get formatted error message for a code"""
     message = ERROR_MESSAGES.get(code, "An error occurred")
-    return message.format(**kwargs) if kwargs else message
+    return code + '_' + message.format(**kwargs) if kwargs else code + '_' + message

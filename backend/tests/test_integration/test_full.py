@@ -32,7 +32,6 @@ async def test_full(
     )
     assert response.status_code == 200
     access_token = response.json()['access_token']
-    print(access_token)
     
     # Search, using access token
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -52,3 +51,12 @@ async def test_full(
     )
     assert response.status_code == 200
     assert 'Kimmy' in response.json()['dataEmployee'][0]['first_name']
+
+    # Login failed
+    response = await async_test_client.post(
+        ROUTER_AUTH + '/token',
+        data = {'username': 'solus162', 'password': 'Minhh@m1'}
+    )
+    assert response.status_code == 404
+    assert 'AUTH_1001' in response.json()['detail']
+    # access_token = response.json()['access_token']
