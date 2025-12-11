@@ -51,7 +51,7 @@ export const InputEmail = ({ id, label, placeholder, value, onChange, disabled})
 
 export const InputPassword = ({
   id, label, showPassword, placeholder, value,
-  onChange, disabled, setShowPassword }) => {
+  onChange, disabled, setShowPassword, setValid }) => {
   return (
     <div className="mb-6">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
@@ -77,7 +77,7 @@ export const InputPassword = ({
           {showPassword ? <BsEyeSlash className="w-5 h-5" /> : <BsEye className="w-5 h-5" />}
         </button>
       </div>
-      <PasswordAlert password={value}/>
+      <PasswordAlert password={value} setValid={setValid}/>
     </div>
   )
 }

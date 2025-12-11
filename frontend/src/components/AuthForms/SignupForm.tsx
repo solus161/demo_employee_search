@@ -8,9 +8,10 @@ import { DepartmentResponse, SignupFormData, SignupResponse } from "@/api/authSe
 interface SignupFormProps {
   onSubmit?: (signupData: SignupFormData) => Promise<SignupResponse>
   getDepartments?: () => Promise<DepartmentResponse>
+  onSuccess?: () => void
 }
 
-export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments }) => {
+export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments, onSuccess }) => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [department, setDepartment] = useState('')
@@ -20,6 +21,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isLoading, setLoading] = useState(false)
+  const [isFormValid, setFormValid] = useState(false)
 
   // Run on mount
   useEffect(() => {
@@ -33,8 +35,10 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
     setError(null)
     setLoading(true)
     const response = await onSubmit?.({ username, email, department, password })
+    console.log('SignupForm', response)
     if (response.success) {
       setSuccess(true)
+      onSuccess()
     } else {
       setError(response.detail)
     }
@@ -103,11 +107,12 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
             onChange={(e) => {setPassword(e.target.value)}}
             disabled={isLoading}
             setShowPassword={() => setShowPassword(!showPassword)}
+            setValid={setFormValid}
           />
 
           {/* Submit button */}
           <Button 
-            disabled={isLoading}
+            disabled={isLoading || !isFormValid}
             onClick={handleSubmit}
             label={isLoading ? 'Creating user ...' : 'Submit'}
           />
