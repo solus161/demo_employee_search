@@ -1,10 +1,10 @@
 import { API_CONFIG, API_ENDPOINTS } from "./configs";
 
-export interface SignupForm {
+export interface SignupFormData {
   username: string
-  password: string
   email: string
   department: string | null
+  password: string
 }
 
 export interface LoginCredentials {
@@ -20,8 +20,10 @@ export type LoginResponse =
   | { success: true, access_token: string}
   | { success: false, detail: string }
 
+export type DepartmentResponse = { departments: string[] }
+
 export default class AuthService{
-  static async signup(signupData: SignupForm): Promise<SignupResponse> {
+  static async signup(signupData: SignupFormData): Promise<SignupResponse> {
     // Handle the sign up
     const formData = new FormData()
     formData.append('username', signupData.username)
@@ -102,5 +104,17 @@ export default class AuthService{
   static validatePassword(password: string): boolean {
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
     return pattern.test(password)
+  }
+
+  static async getDeparments(): Promise<DepartmentResponse> {
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}/${API_ENDPOINTS.DEPT_LIST}`,
+      { method: 'GET'}
+    )
+    if (response.ok) {
+      return response.json()
+    } else {
+      return {departments: ['error'] }
+    }
   }
 }

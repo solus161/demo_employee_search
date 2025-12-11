@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { InputText, InputPassword } from './AuthInputs'
+import { InputEmail } from './Inputs'
 import React, { useState } from 'react'
 
-const metaInputText: Meta<typeof InputText> = {
-  title: 'Auth/InputText',
-  component: InputText,
+const metaInputEmail: Meta<typeof InputEmail> = {
+  title: 'Auth/InputEmail',
+  component: InputEmail,
   parameters: {
     layout: 'centered',
   },
@@ -18,19 +18,18 @@ const metaInputText: Meta<typeof InputText> = {
   ],
 }
 
-export default metaInputText
+export default metaInputEmail
 
-type StoryInputText = StoryObj<typeof metaInputText>
+type StoryInputText = StoryObj<typeof metaInputEmail>
 
-export const UsernameInput: StoryInputText = {
+export const EmailInput: StoryInputText = {
   render: () => {
     const [textValue, setTextValue] = useState('')
     return (
-      <InputText
-        id='username'
-        label='Username'
-        placeholder='Enter username'
-        name='username'
+      <InputEmail
+        id='email'
+        label='Email'
+        placeholder='Enter email'
         value={textValue}
         onChange={(e: React.FormEvent) => {
           setTextValue(e.target.value);

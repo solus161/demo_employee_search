@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { InputPassword } from './AuthInputs'
+import { InputPassword } from './Inputs'
 import React, { useState } from 'react'
-import AuthService from '@/api/authService'
 
 const metaInputPassword: Meta<typeof InputPassword> = {
   title: 'Auth/InputPassword',
@@ -33,13 +32,11 @@ export const PasswordInput: StoryInput = {
         label='Password'
         showPassword={showPassword}
         placeholder='Enter password'
-        name='password'
         value={passwordValue}
         onChange={(e: React.FormEvent) => {
           setPasswordValue(e.target.value)
           console.log(e.target.value)}}
         disabled={false}
-        setShowPassword={() => {setShowPassword(!showPassword)}}
-        showPasswordReq={true} />)
+        setShowPassword={() => {setShowPassword(!showPassword)}}/>)
       }
     }
