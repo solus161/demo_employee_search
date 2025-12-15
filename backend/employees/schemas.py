@@ -1,5 +1,14 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
+
+class EmployeeSearchQuery(BaseModel):
+    search_str: str = Field(validation_alias = 'searchStr')
+    department: str = Field(validation_alias = 'department')
+    location: str = Field(validation_alias = 'location')
+    location_city: str = Field(validation_alias = 'locationCity')
+    location_state: str = Field(validation_alias = 'locationState')
+    page_size: int = Field(validation_alias = 'pageSize')
+    page: int = Field(validation_alias = 'page')
 
 class Employee(BaseModel):
     # Field set to optional could be ommited

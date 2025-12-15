@@ -9,7 +9,7 @@ interface LoginFormProps {
   onSuccess?: () => void
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, onSwitchToSignup, onSuccess}) => {
+export const LoginForm = ({ onSubmit, onSwitchToSignup, onSuccess}): LoginFormProps => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)

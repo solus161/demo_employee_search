@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useEffect } from 'react'
 import './App.css'
-import ClsSearchPage from './components/Layout'
+import ClsSearchPage from './components/SearchPage/Layout'
 import { AuthContainer } from './components/AuthForms'
 
 function App() {

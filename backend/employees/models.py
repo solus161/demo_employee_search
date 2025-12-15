@@ -46,6 +46,6 @@ def build_query(authorized_columns: list, search_params: dict):
 
     # Other params
     for k, v in search_params.items():
-        if k in authorized_columns and v is not None:
+        if k in authorized_columns and (v is not None and v != ''):
             query = query.where(getattr(Employee, k) == v)
     return query

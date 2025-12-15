@@ -44,12 +44,12 @@ async def test_search_employee(
     _ = setup_override_auth_process
 
     search_params = {
-        'search_str': 'kimmy   walczynski',
+        'searchStr': 'kimmy   walczynski',
         'department': 'Engineering',
-        'location': 'Headquarters',
-        'location_city': 'Cleveland',
-        'location_state': 'Ohio',
-        'page_size': 10,
+        'location': '',
+        'locationCity': 'Cleveland',
+        'locationState': 'Ohio',
+        'pageSize': 10,
         'page': 1
     }
     response = await async_test_client.get(

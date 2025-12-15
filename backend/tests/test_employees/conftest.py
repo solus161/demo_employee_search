@@ -84,6 +84,7 @@ async def mock_db_employees(async_session):
         async_session.add(EmployeeModel(**employee_dict))
     await async_session.commit()
 
-    query = select(EmployeeModel).where(EmployeeModel.first_name == 'Kimmy')
-    e = await async_session.execute(query)
-    e = e.scalars().first()
+    # query = select(EmployeeModel).where(EmployeeModel.first_name == 'Kimmy')
+    # e = await async_session.execute(query)
+    # e = e.scalars().first()
+    

@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
-import { BttAddEmployee, BttExport, BttImport, BttFilter } from './Buttons'
-import { SearchInput } from "./SrcSearchEmployee"
-import { SearchStats, EmployeeTable } from "./TblEmployee"
-import { PageSize, PageList } from './Pagination'
-import { mock } from 'node:test'
+import { BttAddEmployee, BttExport, BttImport, BttFilter } from './ui/Buttons'
+import { SearchInput } from "./ui/SearchEmployees"
+import { SearchStats, EmployeeTable } from "./ui/TblEmployee"
+import { PageSize, PageList } from './ui/Pagination'
+import { SearchQuery, EmployeeSearchResponse }  from '@/api/dbService'
+
+const SearchTimeout = 500 // wait 500ms then search
 
 const mockCallback = () => {
   alert('This')
@@ -21,41 +23,91 @@ const mockData = {
     {id: '2', a: '1', b: '2'}]
   }
 
-export default function ClsSearchPage() {
+interface SearchPageProps {
+  onSearch?: (params: SearchQuery)  => Promise<EmployeeSearchResponse>
+  onAddEmployee?: () => void
+  onImport?: () => void
+  onExport?: () => void
+}
+
+export const SearchPage = ({ onSearch, onAddEmployee }): SearchPageProps => {
   // const {totalPage, totalCount, currentPage, pageSize, columns, pageSizeList, dataEmployee} = data
-  
+  const [searchStr, setSearchStr] = useState('')
+  const [department, setDepartment] = useState('')
+  const [location, setLocation] = useState('')
+  const [locationCity, setLocationCity] = useState('')
+  const [locationState, setLocationState] = useState('')
   const [totalPage, setTotalpage] = useState(mockData.totalPage)
   const [totalCount, setTotalCount] = useState(mockData.totalCount)
   const [currentPage, setCurrentPage] = useState(mockData.currentPage)
   const [pageSize, setPageSize] = useState(mockData.pageSize)
   const [columns, setColumns] = useState(mockData.columns)
   const [pageSizeList, setPageSizeList] = useState(mockData.pageSizeList)
-  const [dataEmployee, setDataEmployee] = useState(mockData.dataEmployee)
+  const [error, setError] = useState('')
+  const [lastInputTime, setLastInputTime] = useState(null)
+  const [showFilter, setShowFilter] = useState(false)
+  // const [dataEmployee, setDataEmployee] = useState(mockData.dataEmployee)
 
-  const handlePagePrevious = () => {
+  const handleSubmit = async () => {
+    const searchParams = {
+      searchStr: searchStr,
+      department: department,
+      location: location,
+      locationCity: locationCity,
+      locationState: locationState,
+      pageSize: pageSize,
+      page: currentPage
+    }
+    const response = await onSearch?.(searchParams)
+    if (response.success) {
+      return null
+    } else {
+      setError(response.detail)
+    }
+  }
+
+  const onSearchStrChange = async (e) => {
+      const lastMessage = e.target.value
+      const wait = new Promise((resolve) =>   
+        setTimeout(resolve, 1000))
+      wait.then(() => {
+        if (lastMessage == e.target.value) {
+          console.log('Searching for:', lastMessage)
+        }
+      })
+    }
+
+  const handlePagePrevious = async () => {
     // When clicking on page Previous button
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1)
+      await handleSubmit()
     }
   }
 
-  const handlePageNext = () => {
+  const handlePageNext = async () => {
     // When clicking on page Next button
     if (currentPage < totalPage) {
       setCurrentPage(currentPage + 1)
+      await handleSubmit()
     }
   }
 
-  const handleSetCurrentpage = (targetpage: number) => {
-    setCurrentPage(targetpage)
+  const handleSetCurrentpage = async (targetPage: number) => {
+    if (targetPage != currentPage) {
+      setCurrentPage(targetPage)
+      await handleSubmit()
+    }
   }
 
-  const handlePageSizeChange = (newPageSize: number) => {
+  const handlePageSizeChange = async (newPageSize: number) => {
     // When change page size
-    setPageSize(newPageSize)
+    if (newPageSize != pageSize) {
+      setPageSize(newPageSize)
+      await handleSubmit()
+    }
   }
 
-  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
@@ -68,22 +120,19 @@ export default function ClsSearchPage() {
       <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         {/* Left side - Add Employee and Search */}
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">           
-          <BttAddEmployee callbackFn={mockCallback}/>
+          <BttAddEmployee onClick={onAddEmployee}/>
           
           {/* Search input */}
           <div className="relative w-full sm:w-80">
-            <SearchInput />
-            <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+            <SearchInput onChange={onSearchStrChange} />
           </div>
         </div>
 
         {/* Right side */}
         <div className='flex gap-3 w-full sm:w-auto'>
-          <BttImport callbackFn={mockCallback}/>
-          <BttExport callbackFn={mockCallback}/>
-          <BttFilter callbackFn={mockCallback}/>
+          <BttImport onClick={mockCallback}/>
+          <BttExport onClick={mockCallback}/>
+          <BttFilter onClick={mockCallback}/>
         </div>
 
         {/* Filter panel, hidden */}
