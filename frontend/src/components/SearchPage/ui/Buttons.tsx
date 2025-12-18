@@ -1,4 +1,3 @@
-frontend/src/components/SearchPage/Buttons.tsximport React from 'react'
 import { BsPersonFillAdd } from "react-icons/bs";
 import { BsCloudUploadFill } from "react-icons/bs";
 import { BsCloudDownloadFill } from "react-icons/bs";

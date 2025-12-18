@@ -1,12 +1,10 @@
-import React from "react";
-
 export const PageSize = ({ sizeList, onChange }) => { 
   return (
     <div className='flex items-center gap-2'>
         <label className='text-sm text-gray-700'>Rows per page:</label>
         <select 
           className='px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none'
-          onChange={(e) => onChange(e.target.value)}>
+          onChange={(e) => onChange(Number(e.target.value))}>
             {sizeList.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
     </div>
@@ -82,13 +80,13 @@ const PageButtons = ({ totalPage, currentPage, onClick}) => {
 }
 
 export const PageList = ({ totalPage, currentPage, onClickPrevious, onClickNext, onClickPage }) => {
-  console.log('Btt Previous', currentPage == 1)
-  console.log('Btt Next', currentPage == totalPage)
+  // console.log('Btt Previous', currentPage == 1)
+  // console.log('Btt Next', currentPage == totalPage)
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 justify-end">
       <button 
         className="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-        onClick={onClickPrevious} disabled={currentPage == 1}>
+        onClick={() => {currentPage > 1 && onClickPrevious()}} disabled={currentPage == 1}>
         Previous
       </button>
 
@@ -96,7 +94,7 @@ export const PageList = ({ totalPage, currentPage, onClickPrevious, onClickNext,
 
       <button 
         className="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        onClick={onClickNext} disabled={currentPage == totalPage}>
+        onClick={() => {currentPage < totalPage && onClickNext()}} disabled={currentPage == totalPage}>
         Next
       </button>
     </div>

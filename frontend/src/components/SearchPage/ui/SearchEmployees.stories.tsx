@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { SearchInput } from './SearchEmployees'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const metaSearchInput: Meta<typeof SearchInput> = {
   title: 'Search/InputSearch',
@@ -24,18 +24,24 @@ type Story = StoryObj<typeof metaSearchInput>
 
 export const Default: Story = {
   render: () => {
-    const onSearchStrChange = async (e) => {
-      const lastMessage = e.target.value
-      const wait = new Promise((resolve) =>   
-        setTimeout(resolve, 1000))
-      wait.then(() => {
-        if (lastMessage == e.target.value) {
-          console.log('Searching for:', lastMessage)
-        }
-      })
-    }
+    // const onSearchStrChange = async (e) => {
+    //   const lastMessage = e.target.value
+    //   const wait = new Promise((resolve) =>   
+    //     setTimeout(resolve, 1000))
+    //   wait.then(() => {
+    //     if (lastMessage == e.target.value) {
+    //       console.log('Searching for:', lastMessage)
+    //     }
+    //   })
+    // }
+    const [searchStr, setSearchStr] = useState('')
+    useEffect(() => {
+      const waitInputStop = setTimeout(() => 
+        console.log('Searching for:', searchStr), 1000)
+      return () => clearTimeout(waitInputStop)
+    },[searchStr])
+    
     return (
-      <SearchInput onChange={(e) => {
-        onSearchStrChange(e)
-      }} />
+      <SearchInput onChange={(e) => {setSearchStr(e.target.value)}}
+      />
     )}}

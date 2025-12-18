@@ -1,13 +1,13 @@
 import { API_CONFIG, API_ENDPOINTS } from "./configs";
 
-export interface SearchQuery {
-  searchStr: string
-  department?: string
-  location?: string
-  locationCity?: string
-  locationState?: string
+export interface SearchParams {
+  searchStr: string | ''
+  department?: string | '' | null
+  location?: string | '' | null
+  locationCity?: string | '' | null
+  locationState?: string | '' | null
   pageSize: number
-  page: number
+  currentPage: number
 }
 
 export type EmployeeSearchResponse =
@@ -16,7 +16,7 @@ export type EmployeeSearchResponse =
     detail: {
       totalCount: number
       totalPage: number
-      page: number
+      currentPage: number
       pageSize: number
       columns: string[]
       dataEmployee: Array<Record<string, any>>
@@ -27,7 +27,7 @@ export type EmployeeSearchResponse =
 export default class DbService {
   static async EmployeeSearch({ 
     searchStr, department, location, locationCity, locationState, 
-    pageSize, page}: SearchQuery): Promise<EmployeeSearchResponse> {
+    pageSize, currentPage}: SearchParams): Promise<EmployeeSearchResponse> {
       const params: Record<string, string> = {
         searchStr: searchStr.toString(),
         department: department?.toString() || '',
@@ -35,7 +35,7 @@ export default class DbService {
         locationCity: locationCity?.toString() || '',
         locationState: locationState?.toString() || '',
         pageSize: pageSize.toString(),
-        page: page.toString(),
+        currentPage: currentPage.toString(),
       }
       const queryString = new URLSearchParams(params).toString()
       

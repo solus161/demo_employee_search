@@ -10,7 +10,6 @@ interface EmployeeTableProps {
 }
 
 export const SearchStats = ({ totalCount, pageSize, currentPage }: SearchStatsProps) => {
-  console.log('Start record', currentPage, pageSize, (currentPage-1)*pageSize + 1)
   return (
     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
       <div>
@@ -34,10 +33,15 @@ export const SearchStats = ({ totalCount, pageSize, currentPage }: SearchStatsPr
 }
 
 export const EmployeeTable = ({ columns, data }: EmployeeTableProps) => {
+  if (data === undefined || data.length === 0) {
+    return (
+      <div className='p-6 text-center text-gray-500'>
+        No employee data found.
+      </div>
+    )
+  }
+
   const colIndex = Object.keys(data[0])
-  console.log(data)
-  // console.log(JSON.parse(data))
-  
   return (
     <div className='overflow-x-auto'>
       <table className='w-full'>
