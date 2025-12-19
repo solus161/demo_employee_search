@@ -50,7 +50,7 @@ async def test_search_employee(
         'locationCity': 'Cleveland',
         'locationState': 'Ohio',
         'pageSize': 10,
-        'page': 1
+        'currentPage': 1
     }
     response = await async_test_client.get(
         ROUTER_PREFIX + '/search', 

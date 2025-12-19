@@ -8,19 +8,19 @@ interface AuthContainerProps {
   onLogin?: (credentials: LoginCredentials) => Promise<LoginResponse>
   onSignup?: (data: SignupFormData) => Promise<SignupResponse>
   onLoginSucceeds?: () => void
-  getDeparments?: () => Promise<DepartmentResponse>
+  getDepartments?: () => Promise<DepartmentResponse>
 }
 
-export const AuthContainer: React.FC<AuthContainerProps> = ({
-  onLogin, onSignup, onLoginSucceeds, getDeparments
-}) => {
+export const AuthContainer = ({
+  onLogin, onSignup, onLoginSucceeds, getDepartments
+}: AuthContainerProps) => {
   const [signupSwitch, toggleSignup] = useState(false)
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center bg-gray-50">
       { signupSwitch ? (
         <SignupForm 
           onSubmit={onSignup}
-          getDepartments={getDeparments}
+          getDepartments={getDepartments}
           onSuccess={() => {toggleSignup(false)}}
         />
       ) : ( 

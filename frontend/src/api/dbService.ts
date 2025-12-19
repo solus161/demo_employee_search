@@ -24,8 +24,18 @@ export type EmployeeSearchResponse =
   }
   | { success: false, detail: string }
 
+export type FilterOptionsResponse = {
+  success: true,
+  detail: {
+    departmentOptions: string[]
+    locationOptions: string[]
+    cityOptions: string[]
+    stateOptions: string[]
+  }
+} | { success: false, detail: string }
+
 export default class DbService {
-  static async EmployeeSearch({ 
+  static async searchEmployees({ 
     searchStr, department, location, locationCity, locationState, 
     pageSize, currentPage}: SearchParams): Promise<EmployeeSearchResponse> {
       const params: Record<string, string> = {
@@ -61,5 +71,26 @@ export default class DbService {
         }
       }
     }
-
- }
+  static async getFilterOptions(): Promise<FilterOptionsResponse> {
+    try {
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_ENDPOINTS.EMPLOYEE_FILTER_OPTIONS}`)
+      
+      if (response.ok) {
+        const data = await response.json().catch(() => ({success: false, detail: 'Invalid response from server'}))
+        return { success: true, detail: data }
+      } else {
+        const error = await response.json().catch(() => ({ detail: 'Failed to fetch filter options' }))
+        return {
+          success: false,
+          detail: error.detail
+        }
+      }
+    } catch (err) {
+      return {
+        success: false,
+        detail: err instanceof Error ? err.message : 'Network error'
+      }
+    }
+  }
+}

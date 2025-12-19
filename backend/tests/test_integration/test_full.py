@@ -36,13 +36,13 @@ async def test_full(
     # Search, using access token
     headers = {'Authorization': f'Bearer {access_token}'}
     search_params = {
-        'search_str': 'kimmy   walczynski',
+        'searchStr': 'kimmy   walczynski',
         'department': 'Engineering',
         'location': 'Headquarters',
-        'location_city': 'Cleveland',
-        'location_state': 'Ohio',
-        'page_size': 10,
-        'page': 1
+        'locationCity': 'Cleveland',
+        'locationState': 'Ohio',
+        'pageSize': 10,
+        'currentPage': 1
     }
     response = await async_test_client.get(
         ROUTER_EMPLOYEE + '/search',

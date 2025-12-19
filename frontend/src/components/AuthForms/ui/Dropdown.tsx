@@ -1,5 +1,5 @@
 const RenderOptions = (options: string[] | object[]) => {
-  if (options.length === 0) return null
+  if (options === null || options === undefined) return null
 
   if (typeof options[0] === 'string'){
     return options.map((item) => (

@@ -17,7 +17,7 @@ from sqlalchemy.orm import sessionmaker
 # AsyncSession = async_sessionmaker(autocommit = False, autoflush = False, bind = engine)
 
 # For ease of use, use a simple sqlite
-engine = create_engine('sqlite+aiosqlite:///database.db')
+engine = create_async_engine('sqlite+aiosqlite:///database.db')
 AsyncSession = async_sessionmaker(bind = engine)
 
 async def get_db_session():

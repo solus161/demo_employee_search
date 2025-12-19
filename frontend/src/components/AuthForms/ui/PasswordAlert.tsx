@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BsCheckCircleFill, BsXCircleFill } from 'react-icons/bs'
 
 interface PasswordRequirement {
@@ -41,12 +41,20 @@ export const PasswordAlert: React.FC<PasswordAlertProps> = ({ password, setValid
   ]
 
   // if (!show) return null
-  setValid(false)
   const allValid = requirements.every((req) => req.isValid)
-  allValid ? setValid(true) : null
-  if (allValid || password.length == 0) {
+  useEffect(() => {
+    if (allValid || password.length === 0) {
+      setValid?.(true)
+    } else {
+      setValid?.(false)
+    }
+  }, [setValid, allValid, password])
+
+  if (allValid || password.length === 0) {
     return null
   }
+
+  setValid(false)
 
   return (
     <div className="fixed z-50 mt-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200">

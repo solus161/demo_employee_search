@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { SearchPage } from './SearchPage'
-import { SearchParams, EmployeeSearchResponse }  from '@/api/dbService'
-import { useEffect, useState } from 'react'
+import {  EmployeeSearchResponse }  from '@/api/dbService'
 
 const metaSearchPage: Meta<typeof SearchPage> = {
   title: 'Search/SearchPage',

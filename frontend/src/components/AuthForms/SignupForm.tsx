@@ -18,17 +18,19 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
   const [password, setPassword] = useState('')
   const [departmentList, setDepartmentList] = useState<string[]>([])
   const [showPassword, setShowPassword] = useState(false)
+  const [isPasswordValid, setPasswordValid] = useState(false)
+  const [isEmailValid, setEmailValid] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isLoading, setLoading] = useState(false)
-  const [isFormValid, setFormValid] = useState(false)
+  // const [isFormValid, setFormValid] = useState(false)
 
   // Run on mount
   useEffect(() => {
     getDepartments?.().then(response => {
       setDepartmentList(response.departments)
     })
-  }, [])
+  }, [getDepartments])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,7 +86,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
             placeholder='Enter email'
             value={email}
             onChange={(e) => {setEmail(e.target.value)}}
-            disabled={isLoading} />
+            disabled={isLoading}
+            setValid={setEmailValid} />
           
           {/* Deparment */}
           <Dropdown
@@ -101,18 +104,19 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
           <InputPassword
             id='password'
             label='Password'
-            showPassword={false}
+            showPassword={showPassword}
             placeholder='Enter password'
             value={password}
             onChange={(e) => {setPassword(e.target.value)}}
             disabled={isLoading}
             setShowPassword={() => setShowPassword(!showPassword)}
-            setValid={setFormValid}
+            setValid={setPasswordValid}
+            showStrength={true}
           />
 
           {/* Submit button */}
           <Button 
-            disabled={isLoading || !isFormValid}
+            disabled={isLoading || (!isPasswordValid && !isEmailValid && !username.length && !department.length) }
             onClick={handleSubmit}
             label={isLoading ? 'Creating user ...' : 'Submit'}
           />

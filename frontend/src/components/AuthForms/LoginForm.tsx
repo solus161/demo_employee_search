@@ -9,15 +9,15 @@ interface LoginFormProps {
   onSuccess?: () => void
 }
 
-export const LoginForm = ({ onSubmit, onSwitchToSignup, onSuccess}): LoginFormProps => {
+export const LoginForm = ({ onSubmit, onSwitchToSignup, onSuccess}: LoginFormProps) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setLoading] = useState(false)
-  const [isFormValid, setFormValid] = useState(false)
+  const [isPasswordValid, setPasswordValid] = useState(false)
   const [error, setError] = useState('')
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
@@ -28,6 +28,7 @@ export const LoginForm = ({ onSubmit, onSwitchToSignup, onSuccess}): LoginFormPr
     } else {
       setError(response.detail)
     }
+    setLoading(false)
   }
   
   return (
@@ -66,12 +67,13 @@ export const LoginForm = ({ onSubmit, onSwitchToSignup, onSuccess}): LoginFormPr
             onChange={(e) => {setPassword(e.target.value)}}
             disabled={isLoading}
             setShowPassword={() => {setShowPassword(!showPassword)}}
-            setValid={setFormValid}
+            setValid={setPasswordValid}
+            showStrength={false}
           />
 
           {/* Submit Button */}
           <Button
-            disabled={isLoading || !isFormValid}
+            disabled={isLoading || !password.length || !username.length}
             label='Login'
             onClick={handleSubmit}
           />

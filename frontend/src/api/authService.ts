@@ -53,7 +53,7 @@ export default class AuthService{
     }
   }
 
-  static async login(username: string, password: string): Promise<LoginResponse> {
+  static async login({ username, password }: LoginCredentials): Promise<LoginResponse> {
     const formData = new FormData()
     formData.append('username', username)
     formData.append('password', password)
@@ -106,13 +106,14 @@ export default class AuthService{
     return pattern.test(password)
   }
 
-  static async getDeparments(): Promise<DepartmentResponse> {
+  static async getDepartments(): Promise<DepartmentResponse> {
     const response = await fetch(
       `${API_CONFIG.BASE_URL}/${API_ENDPOINTS.DEPT_LIST}`,
       { method: 'GET'}
     )
     if (response.ok) {
-      return response.json()
+      const data = await response.json().catch(() => ({ departments: [] }))
+      return {'departments': data }
     } else {
       return {departments: ['error'] }
     }

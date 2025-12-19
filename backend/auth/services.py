@@ -1,14 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from passlib.context import CryptContext
-from typing import Annotated, Optional, List
+from typing import List
 
 from auth.models import User, Department
-from database.database import get_db_session
 from middleware.rate_limiter import RateLimiter
 from exceptions.users import *
 import logging
@@ -262,3 +261,20 @@ async def get_authorized_columns(db_session, user: User) -> List[str]:
         raise NoAccessError
     
     return department.authorized_columns.split(',')
+
+async def get_all_departments(db_session) -> List[str]:
+    """
+    Get all departments from db
+    
+    Args:
+        db_session: database session object, must be async
+        
+    Returns:
+        List of department names
+    """
+
+    # Sr for the raw query, this is bad practice
+    query = text('select distinct department from tbl_employee order by department asc')
+    result = await db_session.execute(query)
+    departments = result.scalars().all()
+    return departments

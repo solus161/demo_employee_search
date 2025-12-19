@@ -1,40 +1,46 @@
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import './App.css'
-import ClsSearchPage from './components/SearchPage/Layout'
-import { AuthContainer } from './components/AuthForms'
+import { AuthContainer } from './components/AuthForms/AuthContainer'
+import { SearchPage } from './components/SearchPage/SearchPage'
+import AuthService from './api/authService'
+import DbService from './api/dbService'
+
+function AppRoutes() {
+  const navigate = useNavigate()
+  
+  return (
+    <Routes>
+      <Route
+        path="/user" 
+        element={
+          <AuthContainer 
+            onLogin={AuthService.login} 
+            onSignup={AuthService.signup}
+            onLoginSucceeds={() => navigate('/employee')}
+            getDepartments={AuthService.getDepartments}
+            />}
+            />
+      <Route
+        path="/search"
+        element={
+          <SearchPage 
+            onSearch={DbService.searchEmployees}
+            onAddEmployee={() => {}}
+            onImport={() => {}}
+            onExport={() => {}}
+            getFilterOptions={DbService.getFilterOptions}
+            />
+        }
+      />
+    </Routes>
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  const handleLogin = (username: string, password: string) => {
-    console.log('Login:', { username, password })
-  }
-
-  const handleSignup = (username: string, email: string, department: string, password: string) => {
-    console.log('Signup:', { username, email, department, password })
-  }
-  
-  // console.log(mockData)
-  useEffect(() => {
-    document.body.className = 'bg-gray-50 min-h-screen'
-    return () => {
-      document.body.className = ''
-    }
-  }, [])
-  // Body styling
-  
-
   return (
-    <AuthContainer 
-      onLogin={handleLogin} 
-      onSignup={handleSignup}
-      departments={['Engineering', 'HR', 'Sales']} // Optional: customize departments
-    />
-    // <ClsSearchPage/>
-    // <div className="min-h-screen flex items-center justify-center bg-black text-white text-4xl font-bold">
-    //   Tailwind is working!
-    // </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   )
 }
 

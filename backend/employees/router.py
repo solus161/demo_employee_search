@@ -6,12 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 import traceback
 
-from auth.services import get_current_user, get_authorized_columns
+from auth.services import get_current_user, is_within_rate_limit, get_authorized_columns
 from auth.router import ROUTER_PREFIX as ROUTER_AUTH
 from employees.models import Employee as EmployeeModel, build_query
 from employees.schemas import EmployeeSearchQuery, PaginatedEmployeeResponse
 from employees.services import get_employees
 from database import get_db_session
+from middleware import global_rate_limiter
 
 
 ROUTER_PREFIX = '/api/v1/employee'
@@ -23,6 +24,7 @@ async def auth_process(
     db_session: AsyncSession = Depends(get_db_session),
     token = Depends(oauth2_scheme)):
     user = await get_current_user(db_session, token)
+    await is_within_rate_limit(global_rate_limiter, user.username)
     authorized_columns = await get_authorized_columns(db_session, user)
     return authorized_columns
 
@@ -49,10 +51,10 @@ async def search_employees(
         employee_search_params.page, employee_search_params.page_size)
     
     return PaginatedEmployeeResponse(
-        totalCount = total_count,
-        totalPage = total_page,
-        page = employee_search_params.page,
-        pageSize = employee_search_params.page_size,
+        total_count = total_count,
+        total_page = total_page,
+        current_page = employee_search_params.page,
+        page_size = employee_search_params.page_size,
         columns = authorized_columns,
-        dataEmployee = employees
+        data_employee = employees
     )

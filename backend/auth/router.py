@@ -4,7 +4,7 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.schemas import Token, User, CreateUserForm
-from auth.services import authenticate, create_access_token, create_user
+from auth.services import authenticate, create_access_token, create_user, get_all_departments
 from database.database import get_db_session
 # from middleware import global_rate_limiter
 
@@ -26,7 +26,6 @@ async def login(
     After successful login, an access token is granted to client
     """
     user = await authenticate(db_session, form_data.username, form_data.password)
-    print(db_session)
     
     # Provice token
     token = create_access_token(data = {'sub': user.username})
@@ -48,3 +47,8 @@ async def auth_create_user(
     db_session = Depends(get_db_session)):
     user = await create_user(
         db_session, **form_data.model_dump())
+    
+@router.get('/departments', status_code = status.HTTP_200_OK, response_model = None)
+async def get_departments(db_session = Depends(get_db_session)):
+    departments = await get_all_departments(db_session)
+    return departments

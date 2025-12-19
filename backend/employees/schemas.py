@@ -8,7 +8,7 @@ class EmployeeSearchQuery(BaseModel):
     location_city: str = Field(validation_alias = 'locationCity')
     location_state: str = Field(validation_alias = 'locationState')
     page_size: int = Field(validation_alias = 'pageSize')
-    page: int = Field(validation_alias = 'page')
+    page: int = Field(validation_alias = 'currentPage')
 
 class Employee(BaseModel):
     # Field set to optional could be ommited
@@ -30,12 +30,12 @@ class Employee(BaseModel):
     model_config = ConfigDict(from_attributes = True)
 
 class PaginatedEmployeeResponse(BaseModel):
-    totalCount: int
-    totalPage: int
-    page: int
-    pageSize: int
+    total_count: int = Field(serialization_alias = 'totalCount')
+    total_page: int = Field(serialization_alias = 'totalPage')
+    current_page: int = Field(serialization_alias = 'currentPage')
+    page_size: int = Field(serialization_alias = 'pageSize')
     columns: List[str]
-    dataEmployee: List[Employee]
+    data_employee: List[Employee] = Field(serialization_alias = 'dataEmployee')
 
     """
     totalPage: 4,

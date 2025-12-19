@@ -1,8 +1,6 @@
 import sqlite3
 import pandas as pd
 
-from backend.auth.models import User, Department
-
 if __name__ == "__main__":
     # Create a fake db in sqlite
     conn = sqlite3.connect('../backend/database.db')
@@ -56,11 +54,11 @@ if __name__ == "__main__":
 
     # Load sample data
     df = pd.read_csv('data/hr.csv')
-    df.to_sql('tbl_employees', conn, if_exists = 'append', index = False)
+    df.to_sql('tbl_employee', conn, if_exists = 'append', index = False)
 
     # Fake authorized data
     departments = [
-        ('Headquarters', 'id,first_name,last_name,birthdate,gender,race,department,jobtitle,location,hire_date,termdate,location_city,location_state'),
+        ('Human Resources', 'id,first_name,last_name,birthdate,gender,race,department,jobtitle,location,hire_date,termdate,location_city,location_state'),
         ('Business Development', 'id,first_name,last_name,birthdate,gender,race,department,jobtitle')
     ]
 

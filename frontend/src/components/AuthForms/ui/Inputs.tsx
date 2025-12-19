@@ -1,5 +1,6 @@
 import { BsEye, BsEyeSlash } from 'react-icons/bs'
 import { PasswordAlert } from './PasswordAlert'
+import { useEffect } from 'react'
 
 export const InputText = ({ id, label, placeholder, value, onChange, disabled }) => {
   return (
@@ -21,9 +22,13 @@ export const InputText = ({ id, label, placeholder, value, onChange, disabled })
     )
 }
 
-export const InputEmail = ({ id, label, placeholder, value, onChange, disabled}) => {
+export const InputEmail = ({ id, label, placeholder, value, onChange, disabled, setValid}) => {
   const valid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) || value.length == 0
-  console.log(valid)
+  
+  useEffect(() => {
+    setValid?.(valid)
+  }, [setValid, valid])
+  
   return (
     <div className="mb-4">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
@@ -51,7 +56,7 @@ export const InputEmail = ({ id, label, placeholder, value, onChange, disabled})
 
 export const InputPassword = ({
   id, label, showPassword, placeholder, value,
-  onChange, disabled, setShowPassword, setValid }) => {
+  onChange, disabled, setShowPassword, setValid, showStrength }) => {
   return (
     <div className="mb-6">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
@@ -77,7 +82,7 @@ export const InputPassword = ({
           {showPassword ? <BsEyeSlash className="w-5 h-5" /> : <BsEye className="w-5 h-5" />}
         </button>
       </div>
-      <PasswordAlert password={value} setValid={setValid}/>
+      {showStrength && <PasswordAlert password={value} setValid={setValid}/>}
     </div>
   )
 }

@@ -63,7 +63,7 @@ export const FilterPanel = ({
           id="filter-department"
           label="Department"
           placeholder="Select Department"
-          value={''}
+          value={department}
           onChange={(e) => onDepartmentChange(e.target.value)}
           disabled={false}
           options={departmentOptions}
@@ -74,7 +74,7 @@ export const FilterPanel = ({
           id="filter-location"
           label="Location Type"
           placeholder="Select Location Type"
-          value={''}
+          value={location}
           disabled={false}
           onChange={(e) => onLocationChange(e.target.value)}
           options={locationOptions}
@@ -85,7 +85,7 @@ export const FilterPanel = ({
           id="filter-city"
           label="City"
           placeholder='Select a city'
-          value={''}
+          value={city}
           onChange={(e) => onLocationCityChange(e.target.value)}
           disabled={false}
           options={cityOptions}
@@ -96,7 +96,7 @@ export const FilterPanel = ({
           id="filter-state"
           label="State"
           placeholder='Select a state'
-          value={''}
+          value={state}
           disabled={false}
           onChange={(e) => onLocationStateChange(e.target.value)}
           options={stateOptions}

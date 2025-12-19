@@ -4,7 +4,7 @@ import { SearchInput } from "./ui/SearchEmployees"
 import { SearchStats, EmployeeTable } from "./ui/TblEmployee"
 import { PageSize, PageList } from './ui/Pagination'
 import { FilterPanel } from './ui/FilterPanel'
-import { SearchParams, EmployeeSearchResponse }  from '@/api/dbService'
+import { SearchParams, EmployeeSearchResponse, FilterOptionsResponse }  from '@/api/dbService'
 
 const SearchTimeout = 1000 // wait 1000ms then search
 
@@ -13,12 +13,7 @@ interface SearchPageProps {
   onAddEmployee?: () => void
   onImport?: () => void
   onExport?: () => void
-  getFilterOptions?: () => Promise<{
-    departmentOptions: string[]
-    locationOptions: string[]
-    cityOptions: string[]
-    stateOptions: string[]
-  }>
+  getFilterOptions?: () => Promise<FilterOptionsResponse>
 }
 
 interface DebouncedParams {
@@ -63,11 +58,13 @@ export const SearchPage = ({
   useEffect(() => {
     const fetchFilterOptions = async () => {
       const options = await getFilterOptions?.()
-      if (options) {
-        setDepartmentList(options.departmentOptions)
-        setLocationList(options.locationOptions)
-        setLocationCityList(options.cityOptions)
-        setLocationStateList(options.stateOptions)
+      if (options.success) {
+        setDepartmentList(options.detail.departmentOptions)
+        setLocationList(options.detail.locationOptions)
+        setLocationCityList(options.detail.cityOptions)
+        setLocationStateList(options.detail.stateOptions)
+      } else {
+        setError(options.detail)
       }
     }
     fetchFilterOptions()
