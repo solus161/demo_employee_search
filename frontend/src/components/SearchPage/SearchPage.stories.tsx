@@ -23,6 +23,15 @@ export default metaSearchPage
 
 type Story = StoryObj<typeof metaSearchPage>
 
+const mockFilterOptions = async () => {
+  return {
+    departmentOptions: ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance'],
+    locationOptions: ['Office', 'Remote', 'Hybrid'],
+    cityOptions: ['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Boston'],
+    stateOptions: ['CA', 'NY', 'TX', 'FL', 'IL', 'MA'],
+  }
+}
+
 const mockFetchDataSuccess = async (params): Promise<EmployeeSearchResponse> => {
   console.log('Mock search called with params', params)
   const data: EmployeeSearchResponse = {
@@ -59,7 +68,8 @@ export const Default: Story = {
         onSearch = {mockFetchDataSuccess}
         onAddEmployee = {() => alert('Add Employee clicked')}
         onImport = {() => alert('Import clicked')}
-        onExport = {() => alert('Export clicked')}  
+        onExport = {() => alert('Export clicked')}
+        getFilterOptions={mockFilterOptions}
       />
     )}}
 
@@ -70,6 +80,7 @@ export const FetchError: Story = {
         onSearch = {mockFetchDataError}
         onAddEmployee = {() => alert('Add Employee clicked')}
         onImport = {() => alert('Import clicked')}
-        onExport = {() => alert('Export clicked')}  
+        onExport = {() => alert('Export clicked')}
+        getFilterOptions={mockFilterOptions}
       />
     )}}

@@ -1,38 +1,17 @@
-import React from 'react'
 import { BsX } from 'react-icons/bs'
+import { BttBasic } from './Buttons'
+import { Dropdown } from '../../AuthForms/ui/Dropdown'
 
-export const Dropdown = ({ 
-  id, label, placeholder, value, onChange, disabled, options }) => {
-  return (
-  <div className="mb-4">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
-      {label}
-    </label>
-    <select
-      id={id}
-      value={value}
-      onChange={onChange}
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-      required
-      disabled={disabled}>
-      <option value="">{placeholder}</option>
-      {options.map((item) => (
-        <option key={item} value={item}>
-          {item}
-        </option>
-      ))}
-    </select>
-  </div>
-  )
-}
 
 interface FilterPanelProps {
   isOpen: boolean
+  onClearFilters: () => void
+  onApplyFilters: () => void
   onClose: () => void
-  // department: string
-  // location: string
-  // locationCity: string
-  // locationState: string
+  department: string
+  location: string
+  city: string
+  state: string
   onDepartmentChange: (value: string) => void
   onLocationChange: (value: string) => void
   onLocationCityChange: (value: string) => void
@@ -43,13 +22,15 @@ interface FilterPanelProps {
   stateOptions?: string[]
 }
 
-export const FilterPanel: React.FC<FilterPanelProps> = ({
+export const FilterPanel = ({
   isOpen,
+  onClearFilters,
+  onApplyFilters,
   onClose,
-  // department,
-  // location,
-  // locationCity,
-  // locationState,
+  department,
+  location,
+  city,
+  state,
   onDepartmentChange,
   onLocationChange,
   onLocationCityChange,
@@ -58,15 +39,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   locationOptions = ['Office', 'Remote', 'Hybrid'],
   cityOptions = ['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Boston'],
   stateOptions = ['CA', 'NY', 'TX', 'FL', 'IL', 'MA'],
-}) => {
+}: FilterPanelProps) => {
   if (!isOpen) return null
-
-  const handleClearFilters = () => {
-    onDepartmentChange('')
-    onLocationChange('')
-    onLocationCityChange('')
-    onLocationStateChange('')
-  }
 
   return (
     <div className="absolute left-0 right-0 z-50 mx-4 mb-6 bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
@@ -101,8 +75,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           label="Location Type"
           placeholder="Select Location Type"
           value={''}
-          onChange={(e) => onLocationChange(e.target.value)}
           disabled={false}
+          onChange={(e) => onLocationChange(e.target.value)}
           options={locationOptions}
         />
 
@@ -123,26 +97,21 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           label="State"
           placeholder='Select a state'
           value={''}
-          onChange={(e) => onLocationStateChange(e.target.value)}
           disabled={false}
+          onChange={(e) => onLocationStateChange(e.target.value)}
           options={stateOptions}
         />
       </div>
 
       {/* Footer Actions */}
       <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-        <button
-          onClick={handleClearFilters}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Clear All
-        </button>
-        <button
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Apply Filters
-        </button>
+        <BttBasic
+          onClick={onClearFilters}
+          label="Clear All"/>
+
+        <BttBasic
+          onClick={onApplyFilters}
+          label="Apply Filters"/>
       </div>
     </div>
   )
