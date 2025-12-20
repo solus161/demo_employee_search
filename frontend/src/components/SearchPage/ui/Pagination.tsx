@@ -23,7 +23,10 @@ const PageButton = ({ pageNumber, selected, onClick }) => {
   const buttonClass = selected ? 'px-3 py-1 bg-blue-600 text-white rounded-lg text-sm font-medium' : 
     'px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50'
   return (
-    <button className={buttonClass} key={pageNumber} onClick={(e) => {onClick(pageNumber)}}>{pageNumber}</button>
+    <button
+      className={buttonClass}
+      onClick={(e) => {onClick(pageNumber)}}>{pageNumber}
+    </button>
   )
 }
 

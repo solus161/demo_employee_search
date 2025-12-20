@@ -21,7 +21,7 @@ export const AuthContainer = ({
         <SignupForm 
           onSubmit={onSignup}
           getDepartments={getDepartments}
-          onSuccess={() => {toggleSignup(false)}}
+          onSuccess={() => {alert('Signup success, switching to Login'); toggleSignup(false)}}
         />
       ) : ( 
         <LoginForm

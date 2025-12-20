@@ -17,7 +17,7 @@ export type SignupResponse =
   | { success: false, detail: string}
 
 export type LoginResponse =
-  | { success: true, access_token: string}
+  | { success: true }
   | { success: false, detail: string }
 
 export type DepartmentResponse = { departments: string[] }
@@ -66,10 +66,8 @@ export default class AuthService{
 
       if (response.ok) {
         const data = await response.json().catch(() => ({}))
-        return {
-          success: true,
-          access_token: data.access_token
-        }
+        this.saveToken(data.access_token)
+        return {success: true}
       } else {
         const error = await response.json().catch(() => ({ detail: 'Login failed' }))
         return {

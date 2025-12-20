@@ -8,9 +8,9 @@ import traceback
 
 from auth.services import get_current_user, is_within_rate_limit, get_authorized_columns
 from auth.router import ROUTER_PREFIX as ROUTER_AUTH
-from employees.models import Employee as EmployeeModel, build_query
+# from employees.models import Employee as EmployeeModel, build_query
 from employees.schemas import EmployeeSearchQuery, PaginatedEmployeeResponse
-from employees.services import get_employees
+from employees.services import get_employees, get_filter_options
 from database import get_db_session
 from middleware import global_rate_limiter
 
@@ -58,3 +58,16 @@ async def search_employees(
         columns = authorized_columns,
         data_employee = employees
     )
+
+@router.get('/filter-options', response_model = None, status_code = status.HTTP_200_OK)
+async def get_departments_options(db_session: Annotated[AsyncSession, Depends(get_db_session)]):
+    filters = await get_filter_options(db_session)
+    col_map = {
+        'department': 'department', 
+        'location': 'location',
+        'location_city': 'locationCity',
+        'location_state': 'locationState'}
+    response = {}
+    for k, v in filters.items():
+        response[col_map[k]] = v
+    return response

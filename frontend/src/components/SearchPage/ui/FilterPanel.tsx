@@ -35,10 +35,10 @@ export const FilterPanel = ({
   onLocationChange,
   onLocationCityChange,
   onLocationStateChange,
-  departmentOptions = ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance'],
-  locationOptions = ['Office', 'Remote', 'Hybrid'],
-  cityOptions = ['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Boston'],
-  stateOptions = ['CA', 'NY', 'TX', 'FL', 'IL', 'MA'],
+  departmentOptions,
+  locationOptions,
+  cityOptions,
+  stateOptions,
 }: FilterPanelProps) => {
   if (!isOpen) return null
 

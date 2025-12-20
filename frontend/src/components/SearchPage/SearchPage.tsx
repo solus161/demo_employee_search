@@ -42,8 +42,8 @@ export const SearchPage = ({
   const [locationState, setLocationState] = useState('')
   const [totalPage, setTotalpage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
-  const [currentPage, setCurrentPage] = useState(0)
-  const [pageSize, setPageSize] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [columns, setColumns] = useState([] as string[])
   const [departmentList, setDepartmentList] = useState([] as string[])
   const [locationList, setLocationList] = useState([] as string[])
@@ -58,11 +58,12 @@ export const SearchPage = ({
   useEffect(() => {
     const fetchFilterOptions = async () => {
       const options = await getFilterOptions?.()
+      // console.log('fetchFIlterOption', options)
       if (options.success) {
-        setDepartmentList(options.detail.departmentOptions)
-        setLocationList(options.detail.locationOptions)
-        setLocationCityList(options.detail.cityOptions)
-        setLocationStateList(options.detail.stateOptions)
+        setDepartmentList(options.detail.department)
+        setLocationList(options.detail.location)
+        setLocationCityList(options.detail.locationCity)
+        setLocationStateList(options.detail.locationState)
       } else {
         setError(options.detail)
       }
@@ -72,7 +73,9 @@ export const SearchPage = ({
 
   // Fix reference for handleSubmit, avoid re-create on each render
   const handleSubmit = useCallback(async (params: SearchParams) => {
+    console.log('handleSubmit', params)
     const response = await onSearch?.(params)
+    console.log('submit response', response)
     if (response.success) {
       setTotalCount(response.detail.totalCount)
       setTotalpage(response.detail.totalPage)
@@ -121,6 +124,7 @@ export const SearchPage = ({
   // Full flow: user types/clicks -> states change -> inboundParams change -> 
   // debouncedParams change -> useEffect trigger -> handleSubmit
   useEffect(() => {
+    // console.log('debounedParams', debouncedParams)
     handleSubmit?.(debouncedParams)
   }, [handleSubmit, debouncedParams])
 
@@ -133,7 +137,7 @@ export const SearchPage = ({
 
   const handleApplyFilters = async () => {
     setShowFilter(false)
-    await handleSubmit?.(inboundParams)
+    await handleSubmit(inboundParams)
   }
 
   return (

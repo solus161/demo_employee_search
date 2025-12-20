@@ -14,21 +14,21 @@ function AppRoutes() {
         path="/user" 
         element={
           <AuthContainer 
-            onLogin={AuthService.login} 
-            onSignup={AuthService.signup}
-            onLoginSucceeds={() => navigate('/employee')}
-            getDepartments={AuthService.getDepartments}
+            onLogin={(params) => AuthService.login(params)} 
+            onSignup={(params) => AuthService.signup(params)}
+            onLoginSucceeds={() => {navigate('/employee')}}
+            getDepartments={() => AuthService.getDepartments()}
             />}
             />
       <Route
-        path="/search"
+        path="/employee"
         element={
-          <SearchPage 
-            onSearch={DbService.searchEmployees}
+          <SearchPage
+            onSearch={(params) => DbService.searchEmployees(params)}
             onAddEmployee={() => {}}
             onImport={() => {}}
             onExport={() => {}}
-            getFilterOptions={DbService.getFilterOptions}
+            getFilterOptions={() => DbService.getFilterOptions()}
             />
         }
       />

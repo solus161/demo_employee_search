@@ -1,4 +1,5 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Employee as EmployeeModel, build_query
 from .schemas import Employee as EmployeeSchema
@@ -49,3 +50,16 @@ async def get_employees(
         output.append(mask_columns(employee, authorized_columns))
     
     return output, total_count, total_page
+
+async def get_filter_options(db_session: AsyncSession):
+    # These raw queries are not good
+    query_template = 'select distinct {} from tbl_employee order by {} asc'
+
+    columns = ['department', 'location', 'location_city', 'location_state']
+    output = {}
+    for col in columns:
+        query = text(query_template.format(col, col))
+        query_results = await db_session.execute(query)
+        query_results = query_results.scalars().all()
+        output[col] = query_results
+    return output

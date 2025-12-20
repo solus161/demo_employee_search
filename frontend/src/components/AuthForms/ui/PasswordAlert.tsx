@@ -15,7 +15,7 @@ interface PasswordAlertProps {
  * Password validation popup that appears near the password input
  * Validates password requirements and shows visual feedback React.FC<PasswordAlertProps>
  */
-export const PasswordAlert: React.FC<PasswordAlertProps> = ({ password, setValid }) => {
+export const PasswordAlert = ({ password, setValid }: PasswordAlertProps) => {
   // Password validation rules
   const requirements: PasswordRequirement[] = [
     {
@@ -43,20 +43,14 @@ export const PasswordAlert: React.FC<PasswordAlertProps> = ({ password, setValid
   // if (!show) return null
   const allValid = requirements.every((req) => req.isValid)
   useEffect(() => {
-    if (allValid || password.length === 0) {
-      setValid?.(true)
-    } else {
-      setValid?.(false)
-    }
-  }, [setValid, allValid, password])
+    setValid?.(allValid)
+  }, [setValid, allValid])
 
-  if (allValid || password.length === 0) {
+  if (!password.length || allValid) {
     return null
   }
 
-  setValid(false)
-
-  return (
+  return (password.length && !allValid &&
     <div className="fixed z-50 mt-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
       {/* Header */}
       <div className="mb-3">

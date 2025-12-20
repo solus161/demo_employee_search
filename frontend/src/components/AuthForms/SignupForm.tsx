@@ -32,19 +32,26 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
     })
   }, [getDepartments])
 
+  console.log(isLoading, isPasswordValid, isEmailValid, username.length, department.length)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setLoading(true)
-    const response = await onSubmit?.({ username, email, department, password })
-    console.log('SignupForm', response)
-    if (response.success) {
-      setSuccess(true)
-      onSuccess()
+    if (!username.length || !email.length || !password.length || !department.length) {
+      setError('Please fill form')
     } else {
-      setError(response.detail)
+      setLoading(true)
+      const response = await onSubmit?.({ username, email, department, password })
+      console.log('SignupForm', response)
+      if (response.success) {
+        setSuccess(true)
+        onSuccess()
+      } else {
+        setError(response.detail)
+      }
+      setLoading(false)
     }
-    setLoading(false)
+    
   }
 
   return (
@@ -116,7 +123,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, getDepartments
 
           {/* Submit button */}
           <Button 
-            disabled={isLoading || (!isPasswordValid && !isEmailValid && !username.length && !department.length) }
+            disabled={isLoading || (!isPasswordValid || !isEmailValid || !username.length || !department.length) }
             onClick={handleSubmit}
             label={isLoading ? 'Creating user ...' : 'Submit'}
           />

@@ -23,11 +23,11 @@ export const InputText = ({ id, label, placeholder, value, onChange, disabled })
 }
 
 export const InputEmail = ({ id, label, placeholder, value, onChange, disabled, setValid}) => {
-  const valid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) || value.length == 0
+  const valid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)
   
   useEffect(() => {
-    setValid?.(valid)
-  }, [setValid, valid])
+    setValid?.(valid && value.length)
+  }, [setValid, valid, value.length])
   
   return (
     <div className="mb-4">
@@ -44,12 +44,11 @@ export const InputEmail = ({ id, label, placeholder, value, onChange, disabled, 
         required
         disabled={disabled}
       />
-      {!valid && (
+      {!valid && value.length > 0 && (
         <div className="fixed z-50 mt-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
           Invalid email pattern
         </div>
       )}
-      
     </div>
   )
 }
